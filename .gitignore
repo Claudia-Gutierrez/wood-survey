@@ -1,0 +1,6 @@
+.Rproj.user
+.Rhistory
+.RData
+attic/*
+data-raw/*
+!data-raw/individual.R
