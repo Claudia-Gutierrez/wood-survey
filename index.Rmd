@@ -1,0 +1,146 @@
+---
+title: "Analysis of NEON Woody plant vegetation structure data"
+author: "Claudia Gutierrez"
+date: "11/12/2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+---
+
+## Background 
+
+Structure measurements, including height, crown diameter, and stem diameter, as well as mapped position of individual woody plants
+
+normal text
+
+*italic text*
+
+**bold text**
+
+***bold italic text***
+
+superscript^2^
+
+~~strikethrough~~
+
+# Header 1
+## Header 2
+### Header 3
+#### Header 4
+##### Header 5
+###### Header 6
+
+
+- first item in the list
+- second item in list
+- third item in list
+
+1. first item in the list
+1. second item in list
+1. third item in list
+
+first item in the list
+second item in list
+third item in list
+
+> this text will be quoted 
+
+`this text will appear as code`
+
+
+```{r}
+a<-10
+```
+
+the value of parameter *a* is `r a`
+
+Table Header  | Second Header
+- | -
+Cell 1        | Cell 2
+Cell 3        | Cell 4 
+
+[Download R](http://www.r-project.org/)    
+[RStudio](http://www.rstudio.com/)
+
+You can write LaTeX math expressions inside a pair of dollar signs, e.g. 
+
+$\alpha+\beta$
+
+
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+
+```{r chunk-name}
+print('hello world!')
+```
+
+```{r dont-eval, eval=FALSE}
+print('hello world!')
+```
+```{r}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+    
+## Data
+
+```{r hide-code, echo=FALSE}
+
+## @knitr  analysis-setup  
+library(ggplot2)
+library(magrittr)
+library(readr)
+library(here)
+library(dplyr)
+individual <- readr::read_csv(here::here("data", "individual.csv")) %>%
+    dplyr::select(stem_diameter, height, growth_form)
+analysis_df <- individual %>%
+  dplyr::filter(!is.na(growth_form),
+                growth_form != "liana")
+
+## @knitr  analysis-fig1-barplot 
+analysis_df %>%
+ggplot(aes(y = growth_form, colour = growth_form, 
+           fill = growth_form)) +
+    geom_bar(alpha = 0.5, show.legend = FALSE)
+## @knitr  analysis-fg2-violinplots 
+analysis_df %>%
+    tidyr::pivot_longer(cols = c(stem_diameter, height), 
+                        names_to = "var",
+                        values_to = "value") %>%
+    ggplot(aes(x = log(value), y = growth_form, colour = growth_form, fill = growth_form)) +
+    geom_violin(alpha = 0.5, trim = T, show.legend = FALSE) +
+    geom_boxplot(alpha = 0.7, show.legend = FALSE) +
+    facet_grid(~var)
+## @knitr analysis-lm-overall
+lm_overall <- lm(log(stem_diameter) ~ log(height), analysis_df) 
+lm_overall %>%
+    broom::glance()
+lm_overall %>%
+    broom::tidy()
+## @knitr analysis-lm-fig3-overall 
+analysis_df %>%
+    ggplot(aes(x = log(height), y = log(stem_diameter))) +
+    geom_point(alpha = 0.2) +
+    geom_smooth(method = "lm")
+## @knitr  analysis-lm-growth
+lm_growth <- lm(log(stem_diameter) ~ log(height) * growth_form, analysis_df) 
+lm_growth %>%
+    broom::glance()
+lm_growth %>%
+    broom::tidy()
+## @knitr analysis-lm-fig4-growth 
+analysis_df %>%
+    ggplot(aes(x = log(height), y = log(stem_diameter), colour = growth_form)) +
+    geom_point(alpha = 0.1) +
+    geom_smooth(method = "lm") 
+
+knitr::kable(head(airquality), caption = "New York Air Quality Measurements")
+
+DT::datatable(airquality, caption = "New York Air Quality Measurements")
+```
+
+
+
