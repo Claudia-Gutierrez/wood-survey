@@ -65,6 +65,8 @@ Cell 3        | Cell 4
 [Download R](http://www.r-project.org/)    
 [RStudio](http://www.rstudio.com/)
 
+[GitHublink](https://github.com/Claudia-Gutierrez/wood-survey/)
+
 You can write LaTeX math expressions inside a pair of dollar signs, e.g. 
 
 $\alpha+\beta$
